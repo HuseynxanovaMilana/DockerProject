@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+  labels:
+    app: django-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    metadata:
+      labels:
+        app: django-app
+    spec:
+      containers:
+      - name: django-app
+        image: your_dockerhub_user/django-app:latest
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - mountPath: /app/db.sqlite3
+          subPath: db.sqlite3
+        - mountPath: /app/templates
+          name: templates-volume
+      volumes:
+      - name: sqlite-db
+        persistentVolumeClaim:
+          claimName: sqlite-pvc
+      - name: templates-volume
+        hostPath:
+          path: /path/to/your/templates
+          type: Directory
